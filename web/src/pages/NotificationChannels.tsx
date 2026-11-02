@@ -63,6 +63,7 @@ interface FormValues {
     emailSubject: string;
     telegramEnabled: boolean;
     telegramApiToken: string;
+    telegramBaseUrl: string;
     telegramUserid: string;
     telegramProxyEnabled: boolean;
     telegramProxyUrl: string;
@@ -104,6 +105,7 @@ const DEFAULT_FORM_VALUES: FormValues = {
     emailSubject: '收到新短信 - {{from}}',
     telegramEnabled: false,
     telegramApiToken: '',
+    telegramBaseUrl: 'https://api.telegram.org',
     telegramUserid: '',
     telegramProxyEnabled: false,
     telegramProxyUrl: '',
@@ -204,6 +206,7 @@ function channelsToFormValues(channels: NotificationChannel[]): FormValues {
     values.emailSubject = getStringConfig(email, 'subject', DEFAULT_FORM_VALUES.emailSubject);
     values.telegramEnabled = telegram?.enabled ?? false;
     values.telegramApiToken = getStringConfig(telegram, 'apiToken');
+    values.telegramBaseUrl = getStringConfig(telegram, 'baseUrl', DEFAULT_FORM_VALUES.telegramBaseUrl);
     values.telegramUserid = getStringConfig(telegram, 'userid');
     values.telegramProxyEnabled = getBooleanConfig(telegram, 'proxyEnabled');
     values.telegramProxyUrl = getStringConfig(telegram, 'proxyUrl');
@@ -355,6 +358,7 @@ export default function NotificationChannels() {
                 enabled: formValues.telegramEnabled,
                 config: {
                     apiToken: formValues.telegramApiToken,
+                    baseUrl: formValues.telegramBaseUrl.trim() || DEFAULT_FORM_VALUES.telegramBaseUrl,
                     userid: formValues.telegramUserid,
                     proxyEnabled: formValues.telegramProxyEnabled,
                     proxyUrl: formValues.telegramProxyUrl,
@@ -463,6 +467,10 @@ export default function NotificationChannels() {
             case 'telegram':
                 return (
                     <div className="grid gap-5">
+                        <Field label="API Base URL">
+                            <ChannelInput value={formValues.telegramBaseUrl} onChange={(event) => updateField('telegramBaseUrl', event.target.value)} placeholder="https://api.telegram.org" className={inputClass}/>
+                            <p className="mt-1 text-xs text-slate-500">留空使用 Telegram 官方服务器，发送路径会自动追加 /bot&lt;token&gt;/sendMessage。</p>
+                        </Field>
                         <Field label="Bot API Token" required>
                             <ChannelInput type="password" value={formValues.telegramApiToken} onChange={(event) => updateField('telegramApiToken', event.target.value)} placeholder="123456:ABC..." className={inputClass}/>
                         </Field>

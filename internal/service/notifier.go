@@ -184,7 +184,12 @@ func (n *Notifier) sendTelegramByConfig(ctx context.Context, config map[string]i
 	proxyPassword := config["proxyPassword"].(string)
 
 	// 构建发送消息的URL
-	baseURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", apitoken)
+	baseURL, _ := config["baseUrl"].(string)
+	baseURL = strings.TrimSpace(baseURL)
+	if baseURL == "" {
+		baseURL = "https://api.telegram.org"
+	}
+	baseURL = fmt.Sprintf("%s/bot%s/sendMessage", strings.TrimRight(baseURL, "/"), apitoken)
 	body := map[string]interface{}{
 		"chat_id": userid,
 		"text":    message,
